@@ -1,0 +1,34 @@
+name: Test Workflow
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup PHP with PECL extension
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: redis
+
+      - name: Install shopwell-cli
+        uses: shopwell-shop/shopwell-cli-action@v3
+
+      - name: Create Shopwell project
+        run: shopwell-cli project create test-project latest
+
+      - name: Delete vendor
+        working-directory: test-project
+        run: rm -rf vendor
+
+      - name: Build Project
+        uses: ./.
+        with:
+            path: test-project
